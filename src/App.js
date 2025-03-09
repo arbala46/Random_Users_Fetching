@@ -3,11 +3,17 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false); // New loading state
 
   const fetchUsers = () => {
-    fetch("https://randomuser.me/api/?results=5") // Fetch 5 users
+    setLoading(true); // Start loading
+    fetch("https://randomuser.me/api/?results=5")
       .then((response) => response.json())
-      .then((data) => setUsers(data.results));
+      .then((data) => {
+        setUsers(data.results);
+        setLoading(false); // Stop loading
+      })
+      .catch(() => setLoading(false)); // Stop loading on error
   };
 
   return (
@@ -16,6 +22,9 @@ export default function App() {
       <button className="btn btn-primary mb-4" onClick={fetchUsers}>
         Fetch Users
       </button>
+
+      {/* Show blinking message while loading */}
+      {loading && <p className="blink-text">Fetching data... Please wait</p>}
 
       <div className="row">
         {users.map((user, index) => (
@@ -35,6 +44,23 @@ export default function App() {
           </div>
         ))}
       </div>
+
+      {/* Blinking effect CSS */}
+      <style>
+        {`
+          .blink-text {
+            font-size: 18px;
+            color: red;
+            animation: blink 1s infinite;
+          }
+
+          @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
     </div>
   );
 }
